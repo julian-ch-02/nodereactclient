@@ -4,11 +4,27 @@ import FileResizer from "react-image-file-resizer";
 import Loading from "./Loading";
 import { getToken } from "../authToken";
 
-const UploadImage = ({ loading, values, setLoading, setValues, error, setError }) => {
+const UploadImage = ({
+  loading,
+  values,
+  setLoading,
+  setValues,
+  error,
+  setError,
+}) => {
   let images = [];
   const FileResize = (file) => {
     return new Promise((resolve) => {
-      FileResizer.imageFileResizer(file, 300, 300, "JPEG", 100, 0, (file) => resolve(file), "blob");
+      FileResizer.imageFileResizer(
+        file,
+        1920,
+        1920,
+        "JPEG",
+        100,
+        0,
+        (file) => resolve(file),
+        "blob"
+      );
     });
   };
   const handleUpload = async (e) => {
@@ -49,7 +65,13 @@ const UploadImage = ({ loading, values, setLoading, setValues, error, setError }
         <label className="input-group-text" for="inputGroupFile01">
           Upload
         </label>
-        <input type="file" onChange={handleUpload} className="form-control" id="inputGroupFile01" multiple />
+        <input
+          type="file"
+          onChange={handleUpload}
+          className="form-control"
+          id="inputGroupFile01"
+          multiple
+        />
       </div>
       {loading && <Loading />}
     </form>
