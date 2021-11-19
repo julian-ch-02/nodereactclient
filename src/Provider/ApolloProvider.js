@@ -9,7 +9,6 @@ import { getToken } from "../authToken";
 
 const httpLink = createHttpLink({
   uri: process.env.REACT_APP_URI,
-  credentials: "include",
 });
 
 const authLink = setContext(() => {

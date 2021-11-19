@@ -16,7 +16,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     axios
-      .post(process.env.REACT_APP_REFRESH_URI, {}, { withCredentials: true })
+      .post(process.env.REACT_APP_REFRESH_URI, {})
       .then(async (data) => {
         const token = await data.data;
         storeToken(token);
