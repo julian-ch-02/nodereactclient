@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-import axios from "axios";
+import React from "react";
+import { BrowserRouter, Switch } from "react-router-dom";
 
 import "./App.css";
 import { AuthProvider } from "./context/AuthContext";
@@ -10,6 +9,9 @@ import PublicRoute from "./route/PublicRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   return (
     <AuthProvider>
@@ -18,6 +20,7 @@ function App() {
           <PublicRoute path="/login" component={Login} />
           <AuthRoute path="/" component={Dashboard} />
         </Switch>
+        <ToastContainer />
       </BrowserRouter>
     </AuthProvider>
   );

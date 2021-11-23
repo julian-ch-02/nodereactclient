@@ -4,6 +4,7 @@ import { useMutation } from "@apollo/client";
 import UploadImage from "../component/UploadImage";
 import { CREATE_ITEM } from "../gql/mutation";
 import { GET_ITEM } from "../gql/query";
+import { toast } from "react-toastify";
 
 const AddItem = ({ modalAdd, setModalAdd }) => {
   const [values, setValues] = useState({});
@@ -13,6 +14,11 @@ const AddItem = ({ modalAdd, setModalAdd }) => {
     update(_, data) {
       setLoading(false);
       setModalAdd();
+      toast("Add Successfully", {
+        theme: "colored",
+        type: "success",
+        autoClose: 1000,
+      });
     },
     onError(err) {
       console.log(err);
@@ -25,8 +31,8 @@ const AddItem = ({ modalAdd, setModalAdd }) => {
   return (
     <Modal
       show={modalAdd}
-      onHide={setModalAdd}
-      backdrop={loading ? "static" : "default"}
+      onHide={loading ? () => {} : setModalAdd}
+      backdrop={loading ? "static" : true}
       keyboard={false}
     >
       <Modal.Header closeButton>
@@ -43,6 +49,7 @@ const AddItem = ({ modalAdd, setModalAdd }) => {
                 type="text"
                 name="content"
                 disabled={loading && true}
+                autoComplete="off"
                 onChange={(e) => {
                   setValues({ ...values, [e.target.name]: e.target.value });
                 }}
@@ -61,8 +68,10 @@ const AddItem = ({ modalAdd, setModalAdd }) => {
         <Modal.Footer>
           <Button
             variant="secondary"
-            onClick={setModalAdd}
             disabled={loading && true}
+            onClick={() => {
+              setModalAdd();
+            }}
           >
             Close
           </Button>

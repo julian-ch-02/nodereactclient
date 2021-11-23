@@ -4,7 +4,7 @@ import { LOGIN } from "../gql/mutation";
 import { storeToken } from "../authToken";
 
 const Login = (props) => {
-  const [values, setValues] = useState({});
+  const [values, setValues] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
 
   const [loginUser] = useMutation(LOGIN, {
@@ -29,7 +29,7 @@ const Login = (props) => {
         className="form-signin d-flex align-items-center justify-content-center"
         style={{ width: "inherit", height: "inherit" }}
       >
-        <form className="w-25" onSubmit={handleSubmit}>
+        <form className="w-auto" onSubmit={handleSubmit}>
           <h1 className="h3 mb-3 fw-normal text-center">Sign in</h1>
 
           <div className="form-floating">
@@ -41,6 +41,7 @@ const Login = (props) => {
               required
               autoFocus={true}
               value={values.username}
+              autoComplete="off"
               onChange={(e) => {
                 setValues({ ...values, [e.target.name]: e.target.value });
               }}

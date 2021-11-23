@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_ITEM } from "../gql/query";
 import { DELETE_ITEM, UPDATE_ITEM, DELETE_IMAGE } from "../gql/mutation";
-
 import {
   Container,
   Table,
@@ -16,16 +15,22 @@ import Loading from "../component/Loading";
 import Navbar from "../component/Navbar";
 import { getToken } from "../authToken";
 import axios from "axios";
+import { toast } from "react-toastify";
+import ConfirmationModal from "../component/ConfirmationModal";
 
 const Dashboard = () => {
   const [values, setValues] = useState({});
   const [modal, setModal] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
+  const [modalConfirm, setModalConfirm] = useState(false);
   const [images, setImages] = useState([]);
   const { data, loading } = useQuery(GET_ITEM);
+  const [content, setContent] = useState("");
+  const [action, setAction] = useState("");
 
   const [deleteItem] = useMutation(DELETE_ITEM, {
     update(_, data) {
+      setModalConfirm();
       const { token } = getToken();
       axios
         .post(
@@ -39,7 +44,13 @@ const Dashboard = () => {
             },
           }
         )
-        .then((res) => {})
+        .then((res) => {
+          toast("Delete Successfully", {
+            type: "warning",
+            theme: "colored",
+            autoClose: 1000,
+          });
+        })
         .catch((err) => console.log(err));
     },
     onError(err) {
@@ -48,7 +59,12 @@ const Dashboard = () => {
   });
   const [updateItem] = useMutation(UPDATE_ITEM, {
     update() {
-      setModalEdit();
+      setModalConfirm();
+      toast("Edit Successfully", {
+        type: "success",
+        theme: "colored",
+        autoClose: 1000,
+      });
     },
   });
   const [deleteImage] = useMutation(DELETE_IMAGE, {
@@ -76,15 +92,15 @@ const Dashboard = () => {
     },
   });
 
-  const handleEdit = (e) => {
-    e.preventDefault();
+  const handleEdit = () => {
     updateItem({
       variables: { id: values.id, content: values.content },
       refetchQueries: [{ query: GET_ITEM }],
     });
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = () => {
+    const { id } = values;
     deleteItem({ variables: { id }, refetchQueries: [{ query: GET_ITEM }] });
   };
 
@@ -130,6 +146,8 @@ const Dashboard = () => {
                   <td className="align-middle">
                     <Button
                       title="Images"
+                      style={{ borderRadius: "40%" }}
+                      size="sm"
                       className="me-2"
                       onClick={() => {
                         setImages(data.images);
@@ -141,6 +159,8 @@ const Dashboard = () => {
                     </Button>
                     <Button
                       title="Edit"
+                      style={{ borderRadius: "40%" }}
+                      size="sm"
                       className="me-2"
                       variant="info"
                       onClick={() => {
@@ -152,9 +172,15 @@ const Dashboard = () => {
                     </Button>
                     <Button
                       title="Delete"
+                      style={{ borderRadius: "40%" }}
+                      size="sm"
                       variant="danger"
-                      onClick={() => {
-                        handleDelete(data.id);
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setModalConfirm(true);
+                        setContent("Are you sure?");
+                        setValues(data);
+                        setAction("delete");
                       }}
                     >
                       <i className="fas fa-trash"></i>
@@ -174,29 +200,11 @@ const Dashboard = () => {
         <Modal.Body>
           {images.length <= 0
             ? "No Images"
-            : images.map((data) => {
+            : images.map((data, index) => {
                 return (
-                  <>
-                    <Image
-                      className="mb-1"
-                      onMouseEnter={(e) => {
-                        e.target.style.width = "100%";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.width = "65%";
-                      }}
-                      src={data.name}
-                    />
-                    <button
-                      title="Delete Image"
-                      className="btn btn-danger ms-5"
-                      onClick={() => {
-                        handleDeleteImage(data);
-                      }}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </>
+                  <span key={index}>
+                    <Image className="mb-1 w-100" src={data.name} />
+                  </span>
                 );
               })}
         </Modal.Body>
@@ -216,7 +224,15 @@ const Dashboard = () => {
         <Modal.Header closeButton>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
-        <Form onSubmit={handleEdit}>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setModalEdit(false);
+            setModalConfirm(true);
+            setContent("Are you sure?");
+            setAction("edit");
+          }}
+        >
           <Modal.Body>
             <Form.Label column sm="2">
               Item
@@ -248,6 +264,15 @@ const Dashboard = () => {
           </Modal.Footer>
         </Form>
       </Modal>
+      <ConfirmationModal
+        modalConfirm={modalConfirm}
+        setModalConfirm={setModalConfirm}
+        action={action}
+        values={values}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        content={content}
+      />
     </>
   );
 };

@@ -3,6 +3,7 @@ import axios from "axios";
 import FileResizer from "react-image-file-resizer";
 import Loading from "./Loading";
 import { getToken } from "../authToken";
+import { toast } from "react-toastify";
 
 const UploadImage = ({
   loading,
@@ -51,6 +52,11 @@ const UploadImage = ({
           images.push({ name: res.data[i] });
         }
         setValues({ ...values, images });
+        toast("Upload Successfully", {
+          theme: "colored",
+          type: "success",
+          autoClose: 2000,
+        });
       })
       .catch((err) => {
         setError({ ...error, image: err });
@@ -60,9 +66,9 @@ const UploadImage = ({
       });
   };
   return (
-    <form>
+    <>
       <div className="input-group mb-3">
-        <label className="input-group-text" for="inputGroupFile01">
+        <label className="input-group-text" htmlFor="inputGroupFile01">
           Upload
         </label>
         <input
@@ -74,7 +80,7 @@ const UploadImage = ({
         />
       </div>
       {loading && <Loading />}
-    </form>
+    </>
   );
 };
 
